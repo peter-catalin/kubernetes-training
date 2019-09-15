@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-deployment
+spec:
+  # The number of pods we want Kubernetes to create for us.
+  replicas: 3
+  # The selector tells the Deployment what template it should use when creating our pod replicas.
+  selector:
+    matchLabels:
+      component: web
+  # The template that will be used in order to create the pod.
+  template:
+    metadata:
+      # Metadata for each pod, this metadata is used by the seleector defined in the spec in order to find pods.
+      labels:
+        component: web
+    spec:
+      containers:
+        - name: client
+          image: petercatalin/docker-training-multi-client
+          ports:
+            - containerPort: 3000

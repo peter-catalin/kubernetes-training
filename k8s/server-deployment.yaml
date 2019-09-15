@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      component: server
+  template:
+    metadata:
+      labels:
+        component: server
+    spec:
+      containers:
+        - name: server
+          image: petercatalin/docker-training-multi-server
+          ports:
+            - containerPort: 5000
+          env:
+            - name: REDIS_HOST
+              value: redis-cluster-ip-service
+            - name: REDIS_PORT
+              value: "6379"
+            - name: PGUSER
+              value: postgres
+            - name: PGHOST
+              value: postgres-cluster-ip-service
+            - name: PGPORT
+              value: "5432"
+            - name: PGDATABASE
+              value: postgres
+            # Example of an environment variable that is read from a Secret
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  # The name of the secret that holds our variable.
+                  name: pgpassword
+                  # The key of the value we want to retreive from this particular secret, remember that a secret can hold multiple key/value pairs.
+                  key: PGPASSWORD

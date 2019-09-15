@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: client-cluster-ip-service
+spec:
+  type: ClusterIP
+  # By providing a selector this CluserIP service knows what pods it's supposed to provide access to.
+  selector:
+    component: web
+  ports:
+    # The port trough which other objects in our cluster will access the pods trough the ClusterIP service.
+    - port: 3000
+      # The port inside the contianer that we are providing access to.
+      targetPort: 3000

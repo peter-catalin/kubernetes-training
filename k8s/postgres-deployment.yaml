@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: postgres
+  template:
+    metadata:
+      labels:
+        component: postgres
+    spec:
+      # Will give the every single pod created by this Deployment access to a volume claim.
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: database-persistent-volume-claim
+      containers:
+        - name: postgres
+          image: postgres
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            # This name should match a volume name defined in the volumes key under the spec of this template (line 16)
+            - name: postgres-storage
+              # Indicates where the volume should be mounted inside the container. In this case we want all the data stored by postgres
+              # to be persisted in the PersistentVolume.
+              mountPath: /var/lib/postgresql/data
+              # Any data stored in the mount path, will be stored in a subfolder called postgres, this is very specific to postgres and it
+              # will not be requires by other databases.
+              subPath: postgres
+          env:
+            # Whenever we set a environment variable that's called PGPASSWORD Posgtres will use it instead of the default password.
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pgpassword
+                  key: PGPASSWORD
